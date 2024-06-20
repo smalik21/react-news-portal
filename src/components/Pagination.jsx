@@ -3,12 +3,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchNews } from '../features/news/newsSlice';
 import clsx from 'clsx';
 
-const Pagination = ({ category }) => {
+const Pagination = ({ category, keyword }) => {
   const dispatch = useDispatch();
   const { pagination, loading } = useSelector((state) => state.news);
 
   if (!pagination || loading) {
-    return null; // Return null if pagination data is not available or loading
+    return null;
   }
 
   const { limit, offset, count, total } = pagination;
@@ -17,11 +17,11 @@ const Pagination = ({ category }) => {
 
   const renderPageNumbers = () => {
     const pageNumbers = [];
-    const maxPageNumbersToShow = 5; // Change this value to display more or fewer page numbers
+    const maxPageNumbersToShow = 5;
     const startPage = Math.max(1, currentPage - Math.floor(maxPageNumbersToShow / 2));
     const endPage = Math.min(totalPages, startPage + maxPageNumbersToShow - 1);
 
-    // Add "Previous" arrow
+    // "Previous" arrow
     if (currentPage > 1) {
       pageNumbers.push(
         <li key="prev">
@@ -35,13 +35,13 @@ const Pagination = ({ category }) => {
       );
     }
 
-    // Add page numbers
+    // page numbers
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(
         <li key={i} >
           <button
             onClick={() => handlePageChange((i - 1) * limit)}
-            className={clsx('flex justify-center items-center size-8 hover:bg-gray-200 rounded-full', { 'bg-orange-400 hover:bg-orange-400': i === currentPage })}
+            className={clsx('flex justify-center items-center size-8 hover:bg-gray-200 rounded-full border-black', { 'border': i === currentPage })}
           >
             {i}
           </button>
@@ -49,7 +49,7 @@ const Pagination = ({ category }) => {
       );
     }
 
-    // Add "Next" arrow
+    // "Next" arrow
     if (currentPage < totalPages) {
       pageNumbers.push(
         <li key="next">
@@ -67,12 +67,12 @@ const Pagination = ({ category }) => {
   };
 
   const handlePageChange = (newOffset) => {
-    dispatch(fetchNews({ categories: category, offset: newOffset, }));
+    dispatch(fetchNews({ categories: category, keywords: keyword, offset: newOffset }));
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [category, offset, pagination]);
+  }, [category, keyword, offset, pagination]);
 
   return (
     <section className="mt-10 mb-20 space-y-6">

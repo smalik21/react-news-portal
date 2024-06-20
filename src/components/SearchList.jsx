@@ -2,21 +2,20 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNews } from '../features/news/newsSlice';
 import { useParams } from 'react-router-dom';
-import { Capitalize } from '../utils'
 import Pagination from './Pagination';
 import Card from './Card';
 
-export default function NewsList() {
+export default function SearchList() {
 
   const dispatch = useDispatch();
   const { articles, loading, error } = useSelector((state) => state.news);
-  const { category } = useParams();
+  const { keyword } = useParams();
 
   useEffect(() => {
-    console.log("category:", category)
-    const params = category ? { categories: category, offset: 0 } : {};
+    console.log("keyword:", keyword)
+    const params = keyword ? { keywords: keyword, offset: 0 } : {};
     dispatch(fetchNews(params));
-  }, [dispatch, category]);
+  }, [dispatch, keyword]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -29,9 +28,11 @@ export default function NewsList() {
   return (
     <main>
       <section className='px-4 sm:px-20 py-5 space-y-5'>
-        <h2 className='font-semibold text-xl'>{Capitalize(category)} News</h2>
+        <h2 className='text-xl font-light'>Search Results for
+          <span className='font-semibold'> {keyword}</span>
+        </h2>
         {articles.length === 0 ? (
-          <p>No articles found</p>
+          <p className='text-center text-2xl pt-8 text-gray-400'>No articles found</p>
         ) : (
           <ul className='gap-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
             {articles.map((article, idx) => (
@@ -47,7 +48,7 @@ export default function NewsList() {
           </ul>
         )}
       </section>
-      <Pagination category={category} keyword='' />
+      <Pagination category='' keyword={keyword} />
     </main>
   )
 }

@@ -41,7 +41,7 @@ const newsSlice = createSlice({
     error: null,
   },
   reducers: {
-    // Add any additional reducers you need
+
   },
   extraReducers: (builder) => {
     builder
