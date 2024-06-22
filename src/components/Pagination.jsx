@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchNews } from '../features/news/newsSlice';
+import { useSelector } from 'react-redux';
 import clsx from 'clsx';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const Pagination = ({ category, keyword }) => {
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { pagination, loading } = useSelector((state) => state.news);
 
   if (!pagination || loading) {
@@ -12,7 +13,7 @@ const Pagination = ({ category, keyword }) => {
   }
 
   const { limit, offset, count, total } = pagination;
-  const currentPage = Math.floor(offset / limit) + 1;
+  const currentPage = parseInt(searchParams.get('page')) || Math.floor(offset / limit) + 1;
   const totalPages = Math.ceil(total / limit);
 
   const renderPageNumbers = () => {
@@ -26,7 +27,7 @@ const Pagination = ({ category, keyword }) => {
       pageNumbers.push(
         <li key="prev">
           <button
-            onClick={() => handlePageChange(offset - limit)}
+            onClick={() => handlePageChange(currentPage - 1)}
             className='flex justify-center items-center size-8 hover:bg-gray-200 active:bg-gray-400 rounded-full'
           >
             &laquo;
@@ -35,12 +36,12 @@ const Pagination = ({ category, keyword }) => {
       );
     }
 
-    // page numbers
+    // Page numbers
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(
-        <li key={i} >
+        <li key={i}>
           <button
-            onClick={() => handlePageChange((i - 1) * limit)}
+            onClick={() => handlePageChange(i)}
             className={clsx('flex justify-center items-center size-8 hover:bg-gray-200 rounded-full border-black', { 'border': i === currentPage })}
           >
             {i}
@@ -54,7 +55,7 @@ const Pagination = ({ category, keyword }) => {
       pageNumbers.push(
         <li key="next">
           <button
-            onClick={() => handlePageChange(offset + limit)}
+            onClick={() => handlePageChange(currentPage + 1)}
             className='flex justify-center items-center size-8 hover:bg-gray-200 active:bg-gray-400 rounded-full'
           >
             &raquo;
@@ -66,13 +67,13 @@ const Pagination = ({ category, keyword }) => {
     return pageNumbers;
   };
 
-  const handlePageChange = (newOffset) => {
-    dispatch(fetchNews({ categories: category, keywords: keyword, offset: newOffset }));
+  const handlePageChange = (page) => {
+    setSearchParams({ page });
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [category, keyword, offset, pagination]);
+  }, [currentPage]);
 
   return (
     <section className="mt-10 mb-20 space-y-6">

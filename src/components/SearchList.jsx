@@ -1,21 +1,23 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNews } from '../features/news/newsSlice';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import Pagination from './Pagination';
 import Card from './Card';
 
 export default function SearchList() {
-
   const dispatch = useDispatch();
   const { articles, loading, error } = useSelector((state) => state.news);
   const { keyword } = useParams();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    console.log("keyword:", keyword)
-    const params = keyword ? { keywords: keyword, offset: 0 } : {};
+    const page = parseInt(searchParams.get('page')) || 1;
+    const offset = (page - 1) * 10; // Assuming limit is 10
+    const params = { keywords: keyword, offset };
+
     dispatch(fetchNews(params));
-  }, [dispatch, keyword]);
+  }, [dispatch, keyword, searchParams]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -50,5 +52,5 @@ export default function SearchList() {
       </section>
       <Pagination category='' keyword={keyword} />
     </main>
-  )
+  );
 }

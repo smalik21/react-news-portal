@@ -1,22 +1,24 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNews } from '../features/news/newsSlice';
-import { useParams } from 'react-router-dom';
-import { Capitalize } from '../utils'
+import { useParams, useSearchParams } from 'react-router-dom';
+import { Capitalize } from '../utils';
 import Pagination from './Pagination';
 import Card from './Card';
 
 export default function NewsList() {
-
   const dispatch = useDispatch();
   const { articles, loading, error } = useSelector((state) => state.news);
   const { category } = useParams();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    console.log("category:", category)
-    const params = category ? { categories: category, offset: 0 } : {};
+    const page = parseInt(searchParams.get('page')) || 1;
+    const offset = (page - 1) * 10; // Assuming limit is 10
+    const params = { categories: category, offset };
+
     dispatch(fetchNews(params));
-  }, [dispatch, category]);
+  }, [dispatch, category, searchParams]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -49,5 +51,5 @@ export default function NewsList() {
       </section>
       <Pagination category={category} keyword='' />
     </main>
-  )
+  );
 }
